@@ -1,14 +1,360 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/blog/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-    <script type="module" crossorigin src="/blog/assets/index-ChkhYsLJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/blog/assets/index-DyJW91zt.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>밸런스 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .choices {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: linear-gradient(145deg, #f0f0f0, #cacaca);
+            border: none;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .choice-btn.selected {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .next-btn, .restart-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-btn:hover, .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .next-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-container {
+            display: none;
+        }
+
+        .result-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .result-description {
+            font-size: 1.3em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .result-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .choices {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .choice-btn {
+                min-width: 280px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .question {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 밸런스 게임</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="gameArea">
+            <div class="question-container">
+                <div class="question-number" id="questionNumber">문항 1/5</div>
+                <div class="question" id="questionText"></div>
+                <div class="choices" id="choices"></div>
+            </div>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>다음 문항</button>
+        </div>
+        
+        <div class="result-container" id="resultArea">
+            <div class="result-emoji" id="resultEmoji"></div>
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-description" id="resultDescription"></div>
+            <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "친구와 함께 여행을 간다면?",
+                choices: [
+                    { text: "계획적으로 일정을 짜고 가기", type: "A" },
+                    { text: "즉흥적으로 그때그때 정하기", type: "B" }
+                ]
+            },
+            {
+                question: "새로운 음식을 먹을 때",
+                choices: [
+                    { text: "안전하게 아는 맛으로", type: "A" },
+                    { text: "모험적으로 새로운 맛 도전", type: "B" }
+                ]
+            },
+            {
+                question: "주말에 집에서 보낸다면?",
+                choices: [
+                    { text: "혼자만의 시간을 즐기기", type: "A" },
+                    { text: "친구들과 함께 시간 보내기", type: "B" }
+                ]
+            },
+            {
+                question: "돈을 쓸 때 나는?",
+                choices: [
+                    { text: "신중하게 계획하고 쓰기", type: "A" },
+                    { text: "필요하면 과감하게 쓰기", type: "B" }
+                ]
+            },
+            {
+                question: "갈등 상황이 생겼을 때",
+                choices: [
+                    { text: "차근차근 대화로 해결", type: "A" },
+                    { text: "시간이 해결해줄 거라 믿기", type: "B" }
+                ]
+            }
+        ];
+
+        const results = {
+            A: {
+                title: "신중한 계획형 🎯",
+                description: "당신은 모든 일을 계획적으로 접근하는 스타일이에요! 안정감을 중시하고 신중한 판단력을 가진 당신은 주변 사람들에게 믿음직한 존재입니다. 때로는 조금 더 모험적인 선택도 해보세요!",
+                emoji: "🎯"
+            },
+            B: {
+                title: "자유로운 모험형 🚀",
+                description: "당신은 자유롭고 모험적인 성격의 소유자예요! 새로운 경험을 즐기고 즉흥적인 결정을 잘하는 당신은 주변을 활기차게 만드는 에너지를 가지고 있어요. 가끔은 신중한 계획도 도움이 될 거예요!",
+                emoji: "🚀"
+            },
+            BALANCED: {
+                title: "균형잡힌 조화형 ⚖️",
+                description: "당신은 계획적인 면과 자유로운 면을 모두 가진 균형잡힌 성격이에요! 상황에 따라 유연하게 대처할 수 있는 능력이 있으며, 다양한 사람들과 잘 어울릴 수 있는 매력을 가지고 있어요!",
+                emoji: "⚖️"
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = { A: 0, B: 0 };
+        let selectedChoice = null;
+
+        function initGame() {
+            currentQuestion = 0;
+            answers = { A: 0, B: 0 };
+            selectedChoice = null;
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `문항 ${currentQuestion + 1}/5`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+            
+            question.choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = choice.text;
+                button.onclick = () => selectChoice(choice.type, button);
+                choicesDiv.appendChild(button);
+            });
+            
+            document.getElementById('nextBtn').disabled = true;
+            updateProgress();
+        }
+
+        function selectChoice(type, buttonElement) {
+            // 이전 선택 해제
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 현재 선택 표시
+            buttonElement.classList.add('selected');
+            selectedChoice = type;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (selectedChoice) {
+                answers[selectedChoice]++;
+                selectedChoice = null;
+                currentQuestion++;
+                
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResult() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('resultArea').style.display = 'block';
+            
+            let resultType;
+            const diff = Math.abs(answers.A - answers.B);
+            
+            if (diff <= 1) {
+                resultType = 'BALANCED';
+            } else if (answers.A > answers.B) {
+                resultType = 'A';
+            } else {
+                resultType = 'B';
+            }
+            
+            const result = results[resultType];
+            document.getElementById('resultEmoji').textContent = result.emoji;
+            document.getElementById('resultTitle').textContent = result.title;
+            document.getElementById('resultDescription').textContent = result.description;
+            
+            // 진행률 100%로 설정
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartGame() {
+            initGame();
+        }
+
+        // 게임 시작
+        initGame();
+    </script>
+</body>
 </html>
