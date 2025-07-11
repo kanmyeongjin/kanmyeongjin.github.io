@@ -3,358 +3,613 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>밸런스 게임</title>
+    <meta name="description" content="대방건설 - 집에 대한 바른 생각, 정직한 기업철학으로 고객의 행복을 지어갑니다.">
+    <title>대방건설</title>
     <style>
+        /* Reset & Base */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .game-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 700;
-        }
-
-        .question-container {
-            margin-bottom: 30px;
-        }
-
-        .question-number {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .question {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .choices {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .choice-btn {
-            background: linear-gradient(145deg, #f0f0f0, #cacaca);
-            border: none;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            min-width: 200px;
-        }
-
-        .choice-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .choice-btn.selected {
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        .next-btn, .restart-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 25px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 30px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .next-btn:hover, .restart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .next-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .result-container {
-            display: none;
-        }
-
-        .result-title {
-            font-size: 2em;
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .result-description {
-            font-size: 1.3em;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans KR', sans-serif;
             line-height: 1.6;
-            color: #555;
-            margin-bottom: 30px;
+            color: #333;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
         }
 
-        .result-emoji {
-            font-size: 4em;
-            margin-bottom: 20px;
+        /* Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 9999;
         }
 
-        .progress-bar {
+        .skip-link:focus {
+            top: 6px;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            background: #fff;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
-            height: 10px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            margin-bottom: 30px;
+            max-width: 414px;
+            height: 60px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .header__logo {
+            width: 120px;
+            height: 32px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32"><rect width="120" height="32" fill="%23ddd"/><text x="60" y="20" text-anchor="middle" fill="%23666" font-size="12">은성이앤지 로고</text></svg>') no-repeat center;
+            background-size: contain;
+        }
+
+        .header__menu-button {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .header__menu-line {
+            width: 100%;
+            height: 2px;
+            background: #333;
+            transition: all 0.3s ease;
+        }
+
+        /* Main Content */
+        .main {
+            margin-top: 60px;
+            padding-bottom: 60px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
         }
 
-        .progress-fill {
+        .hero__slider {
+            width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.3s ease;
+            position: relative;
         }
 
-        @media (max-width: 600px) {
-            .choices {
-                flex-direction: column;
-                align-items: center;
+        .hero__slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero__slide--active {
+            opacity: 1;
+        }
+
+        .hero__content {
+            position: absolute;
+            bottom: 40px;
+            left: 20px;
+            right: 20px;
+            color: #fff;
+            z-index: 2;
+        }
+
+        .hero__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .hero__subtitle {
+            font-size: 1rem;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+
+        .hero__description {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .hero__indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 3;
+        }
+
+        .hero__indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .hero__indicator--active {
+            background: #fff;
+        }
+
+        /* Section Common */
+        .section {
+            padding: 40px 20px;
+        }
+
+        .section__header {
+            margin-bottom: 30px;
+        }
+
+        .section__title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .section__subtitle {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Business Section */
+        .business__grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .business__card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .business__card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .business__icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .business__card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .business__card-desc {
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        .business__detail {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .business__detail-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .business__detail-text {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Sustainability Section */
+        .sustainability__grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .sustainability__card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .sustainability__card:hover {
+            transform: translateY(-2px);
+        }
+
+        .sustainability__icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .sustainability__card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .sustainability__card-desc {
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* News Section */
+        .news__list {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .news__item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .news__item:last-child {
+            border-bottom: none;
+        }
+
+        .news__item-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .news__item-date {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        /* CTA Sections */
+        .cta {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .cta__title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .cta__button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta__button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: #fff;
+            padding: 40px 20px 30px;
+            margin-top: 40px;
+        }
+
+        .footer__content {
+            max-width: 374px;
+            margin: 0 auto;
+        }
+
+        .footer__logo {
+            width: 100px;
+            height: 28px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 28"><rect width="100" height="28" fill="%23fff"/><text x="50" y="18" text-anchor="middle" fill="%23333" font-size="10">LOGO</text></svg>') no-repeat center;
+            background-size: contain;
+            margin-bottom: 20px;
+        }
+
+        .footer__info {
+            font-size: 0.75rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 16px;
+        }
+
+        .footer__links {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .footer__link {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer__link:hover {
+            color: #fff;
+        }
+
+        .footer__copyright {
+            font-size: 0.625rem;
+            color: #999;
+            margin-top: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .section {
+                padding: 32px 16px;
             }
             
-            .choice-btn {
-                min-width: 280px;
+            .header {
+                padding: 0 16px;
             }
             
-            h1 {
-                font-size: 2em;
+            .hero__content {
+                left: 16px;
+                right: 16px;
             }
             
-            .question {
-                font-size: 1.3em;
+            .hero__title {
+                font-size: 1.375rem;
             }
+        }
+
+        /* Accessibility */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles */
+        *:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🎯 밸런스 게임</h1>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
-        <div id="gameArea">
-            <div class="question-container">
-                <div class="question-number" id="questionNumber">문항 1/5</div>
-                <div class="question" id="questionText"></div>
-                <div class="choices" id="choices"></div>
-            </div>
-            <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>다음 문항</button>
-        </div>
-        
-        <div class="result-container" id="resultArea">
-            <div class="result-emoji" id="resultEmoji"></div>
-            <div class="result-title" id="resultTitle"></div>
-            <div class="result-description" id="resultDescription"></div>
-            <button class="restart-btn" onclick="restartGame()">다시 시작</button>
-        </div>
-    </div>
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">본문으로 바로가기</a>
 
-    <script>
-        const questions = [
-            {
-                question: "친구와 함께 여행을 간다면?",
-                choices: [
-                    { text: "계획적으로 일정을 짜고 가기", type: "A" },
-                    { text: "즉흥적으로 그때그때 정하기", type: "B" }
-                ]
-            },
-            {
-                question: "새로운 음식을 먹을 때",
-                choices: [
-                    { text: "안전하게 아는 맛으로", type: "A" },
-                    { text: "모험적으로 새로운 맛 도전", type: "B" }
-                ]
-            },
-            {
-                question: "주말에 집에서 보낸다면?",
-                choices: [
-                    { text: "혼자만의 시간을 즐기기", type: "A" },
-                    { text: "친구들과 함께 시간 보내기", type: "B" }
-                ]
-            },
-            {
-                question: "돈을 쓸 때 나는?",
-                choices: [
-                    { text: "신중하게 계획하고 쓰기", type: "A" },
-                    { text: "필요하면 과감하게 쓰기", type: "B" }
-                ]
-            },
-            {
-                question: "갈등 상황이 생겼을 때",
-                choices: [
-                    { text: "차근차근 대화로 해결", type: "A" },
-                    { text: "시간이 해결해줄 거라 믿기", type: "B" }
-                ]
-            }
-        ];
+    <!-- Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <h1 class="header__logo">
+                <span class="visually-hidden">대방건설</span>
+            </h1>
+            <button class="header__menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false">
+                <span class="header__menu-line"></span>
+                <span class="header__menu-line"></span>
+                <span class="header__menu-line"></span>
+            </button>
+        </header>
 
-        const results = {
-            A: {
-                title: "신중한 계획형 🎯",
-                description: "당신은 모든 일을 계획적으로 접근하는 스타일이에요! 안정감을 중시하고 신중한 판단력을 가진 당신은 주변 사람들에게 믿음직한 존재입니다. 때로는 조금 더 모험적인 선택도 해보세요!",
-                emoji: "🎯"
-            },
-            B: {
-                title: "자유로운 모험형 🚀",
-                description: "당신은 자유롭고 모험적인 성격의 소유자예요! 새로운 경험을 즐기고 즉흥적인 결정을 잘하는 당신은 주변을 활기차게 만드는 에너지를 가지고 있어요. 가끔은 신중한 계획도 도움이 될 거예요!",
-                emoji: "🚀"
-            },
-            BALANCED: {
-                title: "균형잡힌 조화형 ⚖️",
-                description: "당신은 계획적인 면과 자유로운 면을 모두 가진 균형잡힌 성격이에요! 상황에 따라 유연하게 대처할 수 있는 능력이 있으며, 다양한 사람들과 잘 어울릴 수 있는 매력을 가지고 있어요!",
-                emoji: "⚖️"
-            }
-        };
+        <!-- Main Content -->
+        <main class="main" id="main-content" role="main">
+            <!-- Hero Section -->
+            <section class="hero" role="banner" aria-label="메인 비주얼">
+                <div class="hero__slider">
+                    <div class="hero__slide hero__slide--active" role="img" aria-label="슬라이드 1"></div>
+                </div>
+                <div class="hero__content">
+                    <h2 class="hero__title">은성엔지니어링링</h2>
+                    <p class="hero__subtitle">대표 사진</p>
+                    <p class="hero__description">대표 사진 간단 내용</p>
+                </div>
+                <div class="hero__indicators" role="tablist" aria-label="슬라이드 페이지네이션">
+                    <button class="hero__indicator hero__indicator--active" role="tab" aria-label="슬라이드 1" aria-selected="true"></button>
+                    <button class="hero__indicator" role="tab" aria-label="슬라이드 2" aria-selected="false"></button>
+                    <button class="hero__indicator" role="tab" aria-label="슬라이드 3" aria-selected="false"></button>
+                </div>
+            </section>
 
-        let currentQuestion = 0;
-        let answers = { A: 0, B: 0 };
-        let selectedChoice = null;
-
-        function initGame() {
-            currentQuestion = 0;
-            answers = { A: 0, B: 0 };
-            selectedChoice = null;
-            document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('resultArea').style.display = 'none';
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('questionNumber').textContent = `문항 ${currentQuestion + 1}/5`;
-            document.getElementById('questionText').textContent = question.question;
-            
-            const choicesDiv = document.getElementById('choices');
-            choicesDiv.innerHTML = '';
-            
-            question.choices.forEach((choice, index) => {
-                const button = document.createElement('button');
-                button.className = 'choice-btn';
-                button.textContent = choice.text;
-                button.onclick = () => selectChoice(choice.type, button);
-                choicesDiv.appendChild(button);
-            });
-            
-            document.getElementById('nextBtn').disabled = true;
-            updateProgress();
-        }
-
-        function selectChoice(type, buttonElement) {
-            // 이전 선택 해제
-            document.querySelectorAll('.choice-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // 현재 선택 표시
-            buttonElement.classList.add('selected');
-            selectedChoice = type;
-            document.getElementById('nextBtn').disabled = false;
-        }
-
-        function nextQuestion() {
-            if (selectedChoice) {
-                answers[selectedChoice]++;
-                selectedChoice = null;
-                currentQuestion++;
+            <!-- Business Section -->
+            <section class="section business" role="region" aria-labelledby="business-title">
+                <header class="section__header">
+                    <h2 class="section__title" id="business-title">사업영역</h2>
+                    <p class="section__subtitle">대방건설은 짓습니다. 당신의 곁에서, 당신을 위해서</p>
+                </header>
                 
-                if (currentQuestion < questions.length) {
-                    showQuestion();
-                } else {
-                    showResult();
-                }
-            }
-        }
+                <div class="business__grid">
+                    <article class="business__card">
+                        <div class="business__icon" aria-hidden="true">🏠</div>
+                        <h3 class="business__card-title">설비</h3>
+                        <p class="business__card-desc">주거의 본질적인 가치를 생각하며 보다 나은 새로운 주거공간을 만듭니다</p>
+                    </article>
+                    
+                    <article class="business__card">
+                        <div class="business__icon" aria-hidden="true">🏢</div>
+                        <h3 class="business__card-title">공조조</h3>
+                        <p class="business__card-desc">일반빌딩과 상업시설은 물론 오피스텔까지 높은 품질의 안전한 공간을 만듭니다</p>
+                    </article>
+                    
+                    <article class="business__card">
+                        <div class="business__icon" aria-hidden="true">🚧</div>
+                        <h3 class="business__card-title">배관</h3>
+                        <p class="business__card-desc">새로운 기능성이 뻗어 나아갈 수 있는 튼튼한 토대로 다집니다</p>
+                    </article>
+                    
+                    <article class="business__card">
+                        <div class="business__icon" aria-hidden="true">🌐</div>
+                        <h3 class="business__card-title">전기</h3>
+                        <p class="business__card-desc">유비쿼터스 시대에 맞는 인프라 혁명 대방이 이끌어갑니다</p>
+                    </article>
+                </div>
+                
+                <div class="business__detail">
+                    <h3 class="business__detail-title">1991년부터 쌓아온 독보적인 시공기술</h3>
+                    <p class="business__detail-text">
+                        정직한 시공력과 우수한 기술력, 풍부한 현장경험으로 고객의 희망찬 미래를 설계합니다. 
+                        사람과 자연을 담은 공간, 고객의 삶을 더 건강하고 편안하게 만드는 기술이 있는 곳입니다.
+                    </p>
+                </div>
+            </section>
 
-        function updateProgress() {
-            const progress = ((currentQuestion) / questions.length) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
+            <!-- Sustainability Section -->
+            <section class="section sustainability" role="region" aria-labelledby="sustainability-title">
+                <header class="section__header">
+                    <h2 class="section__title" id="sustainability-title">지속가능경영</h2>
+                    <p class="section__subtitle">사람과 사회, 환경이 공존하는 미래를 만들기 위해 노력합니다</p>
+                </header>
+                
+                <div class="sustainability__grid">
+                    <article class="sustainability__card">
+                        <div class="sustainability__icon" aria-hidden="true">⭐</div>
+                        <h3 class="sustainability__card-title">품질경영</h3>
+                        <p class="sustainability__card-desc">품질경영 우선으로 높은 서비스 품질과 고객만족을 이끌어냅니다</p>
+                    </article>
+                    
+                    <article class="sustainability__card">
+                        <div class="sustainability__icon" aria-hidden="true">🛡️</div>
+                        <h3 class="sustainability__card-title">윤리경영</h3>
+                        <p class="sustainability__card-desc">글로벌 수준의 체계적인 환경경영 전략을 실행하겠습니다</p>
+                    </article>
+                    
+                    <article class="sustainability__card">
+                        <div class="sustainability__icon" aria-hidden="true">🤝</div>
+                        <h3 class="sustainability__card-title">사회공헌</h3>
+                        <p class="sustainability__card-desc">더 나은 우리 사회를 만들기 위한 나눔 경영을 전개합니다</p>
+                    </article>
+                    
+                    <article class="sustainability__card">
+                        <div class="sustainability__icon" aria-hidden="true">🌱</div>
+                        <h3 class="sustainability__card-title">상생경영</h3>
+                        <p class="sustainability__card-desc">모든 협력사와 함께 성장할 수 있도록 상호 간 동반성장을 도모합니다</p>
+                    </article>
+                </div>
+            </section>
+        </main>
 
-        function showResult() {
-            document.getElementById('gameArea').style.display = 'none';
-            document.getElementById('resultArea').style.display = 'block';
-            
-            let resultType;
-            const diff = Math.abs(answers.A - answers.B);
-            
-            if (diff <= 1) {
-                resultType = 'BALANCED';
-            } else if (answers.A > answers.B) {
-                resultType = 'A';
-            } else {
-                resultType = 'B';
-            }
-            
-            const result = results[resultType];
-            document.getElementById('resultEmoji').textContent = result.emoji;
-            document.getElementById('resultTitle').textContent = result.title;
-            document.getElementById('resultDescription').textContent = result.description;
-            
-            // 진행률 100%로 설정
-            document.getElementById('progressFill').style.width = '100%';
-        }
-
-        function restartGame() {
-            initGame();
-        }
-
-        // 게임 시작
-        initGame();
-    </script>
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer__content">
+                <div class="footer__logo">
+                    <span class="visually-hidden">대방건설</span>
+                </div>
+                
+                <address class="footer__info">
+                    서울특별시 중구 을지로 100 (을지로2가)<br>
+                    대표전화: 02-2000-0000<br>
+                    팩스: 02-2000-0001
+                </address>
+                
+                <nav class="footer__links" role="navigation" aria-label="푸터 링크">
+                    <a href="#" class="footer__link">개인정보처리방침</a>
+                    <a href="#" class="footer__link">이용약관</a>
+                    <a href="#" class="footer__link">사이트맵</a>
+                    <a href="#" class="footer__link">Contact Us</a>
+                </nav>
+                
+                <p class="footer__copyright">
+                    &copy; 2025 DAEBANG CONSTRUCTION. All rights reserved.
+                </p>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>
